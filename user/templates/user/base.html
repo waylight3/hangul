@@ -1,0 +1,153 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="keywords" content="한글, 한국어, 한국, 대한민국, 사전, 언어, 번역">
+	{% block meta %}
+	{% endblock meta %}
+	<title>{% block title %}ISU Online Judge{% endblock title %}</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/app.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/blue.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/default.css' %}">
+</head>
+<body>
+	<div class="header">
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="/">
+						<img src="{% static 'img/nav_logo_main.png' %}">
+					</a>
+				</div>
+				<div class="collapse navbar-collapse navbar-responsive-collapse">
+					<ul class="nav navbar-nav">
+						<li class="nav-item"><a href="/사전/국어"><i class="fa fa-cube fa-fw"></i> 국어사전</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li class="nav-item nav-login dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								<img src="{% static 'img/nav_login_logo.png' %}">
+							</a>
+							<ul class="dropdown-menu">
+							{% if user.is_authenticated %}
+								<li>
+									<div class="dropdown-userinfo">
+										<p class="dropdown-label dropdown-label-username"><a href="/user/{{ user.username }}">{{ user.username }}</a></p>
+										<p class="dropdown-label dropdown-label-nickname">{{ userinfo.nickname }}</p>
+										<p class="dropdown-label dropdown-label-point">{{ userinfo.point }}P</p>
+									</div>
+								</li>
+								<li role="separator" class="divider"></li>
+								<li><a href="/logout?next={{ request.path }}">로그아웃</a></li>
+								<li role="separator" class="divider"></li>
+								<li><a href="/setting">설정</a></li>
+								{% if userinfo.user_type == 'admin' %}
+								<li><a href="/admin">관리 페이지</a></li>
+								{% endif %}
+							{% else %}
+								<li><p class="dropdown-label">서비스 준비중이에여!</p></li>
+								<!--
+								<li><p class="dropdown-label">로그인 해 주세요!</p></li>
+								<li><a href="/login?next={{ request.path }}">로그인</a></li>
+								<li><a href="/register">회원가입</a></li>
+								-->
+							{% endif %}
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	</div>
+	<div class="content-wrapper">
+		<article class="user-article">
+			<div class="container content">
+				<h1 class="article-title">{% block article_title %}{% endblock article_title %}</h1>
+				{% block article_content %}
+				{% endblock article_content %}
+			</div>
+		</article>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script src="{% static 'js/stupidtable.js' %}"></script>
+	﻿<script type="text/javascript">
+		var colors = ["red","orange","yellow","green","blue","navy","purple"];
+		var cnt = 0;
+		$(document).ready(function() {
+			setInterval(function() {
+				cnt += 1;
+				var n = colors.length;
+				$(".rainbow").each(function(index) {
+				var len = parseInt($(this).attr('data-length'));
+					for (var i=0; i<len; i++) {
+						$(this).children("span").eq(i).css('color',colors[(cnt+i)%n]);
+					}
+				});
+			}, 100);
+		});
+	</script>
+	<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+  });
+	</script>
+	<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/highlight.min.js"></script>
+	<script type="text/javascript">
+		hljs.initHighlightingOnLoad();
+	</script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('[data-toggle="tooltip"]').tooltip();
+		});
+	</script>
+	<script type="text/javascript" src="https://ddo7jzca0m2vt.cloudfront.net/unify/plugins/back-to-top.js"></script>
+	<script type="text/javascript">
+		$(".comment-reply").click(function(){
+			var id = $(this).data("comment-id");
+			var replyform = $("#replyform" + id)
+			if (replyform.css("display") == "none") {
+				replyform.css("display", "");
+			} else {
+				replyform.css("display", "none");
+			}
+		});
+	</script>
+	<script type="text/javascript">
+		function updateMathJax() {
+			MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+		}
+	</script>
+	<script type="text/javascript">
+		var origin_height = $(".tableofcontents").outerHeight();
+		$(".tableofcontents-fold a").click(function() {
+			if ($(this).data("show") == "false") {
+				$(this).data("show", "true");
+				$(".tableofcontents").css("overflow","").animate({height:origin_height + "px"});
+				$(this).text("[접기]");
+			} else {
+				$(this).data("show", "false");
+				$(".tableofcontents").css("overflow","hidden").animate({height:"5em"});
+				$(this).text("[펼치기]");
+			}
+		});
+	</script>
+	{% block javascript %}
+	{% endblock javascript %}
+</body>
+</html>

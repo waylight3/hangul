@@ -1,0 +1,16 @@
+{% extends "user/base.html" %}
+
+{% block title %}{{ dic.name }}사전{% endblock title %}
+
+{% block article_title %}{{ dic.name }}사전{% endblock article_title %}
+
+{% block article_content %}
+<ul>
+	<li>{{ dic.name }}사전입니다.</li>
+	<li>아직 만드는 중입니다. ㅠㅠ</li>
+</ul>
+<br>
+<ul>
+	<li>추가된 단어: <a href="/사전/국어/한글">한글</a></li>
+</ul>
+{% endblock article_content %}

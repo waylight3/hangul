@@ -1,0 +1,19 @@
+{% extends "user/base.html" %}
+
+{% block title %}{{ word.word }} :: {{ dic.name }}사전{% endblock title %}
+
+{% block article_title %}{{ word.word }}{% endblock article_title %}
+
+{% block article_content %}
+<ol>
+	{% for m in word.word_meanings.all %}
+	<li>{{ m.meaning }}
+		<ul>
+			{% for e in m.meaning_examples.all %}
+			<li>{{ e.example }}</li>
+			{% endfor %}
+		</ul>
+	</li>
+	{% endfor %}
+</ol>
+{% endblock article_content %}

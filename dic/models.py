@@ -38,7 +38,7 @@ class Meaning(models.Model):
 
 class Example(models.Model):
 	example = models.TextField(blank=True, null=True, default='예문') # ex. 한글은 자음 19자, 모음 21자, 받침 27자로 구성된다.
-	meaning = models.ForeignKey(Meaning, blank=True, null=True, default=None, related_name='meaning_examples')  # ex. <국문학>
+	meaning = models.ForeignKey(Meaning, blank=True, null=True, default=None, related_name='meaning_examples')  # ex. 한국어를 표기하는 대한민국의 고유문자.
 	writer = models.ForeignKey(User, blank=True, null=True, default=None, related_name='writer_examples')       # ex. waylight3
 
 	def __str__(self):
