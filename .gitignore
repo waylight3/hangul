@@ -1,0 +1,5 @@
+*.DS_Store
+*.pyc
+*.vs
+settings.json
+media/
