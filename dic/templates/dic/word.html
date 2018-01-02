@@ -5,6 +5,7 @@
 {% block article_title %}{{ word.word }}{% endblock article_title %}
 
 {% block article_content %}
+<strong>[{{ word.pos }}]</strong>
 <ol>
 	{% for m in word.word_meanings.all %}
 	<li>{{ m.meaning }}
