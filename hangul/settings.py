@@ -86,8 +86,8 @@ with open('settings.json', 'r') as fp:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gk',
-        'USER': 'root',
+        'NAME': db_name,
+        'USER': db_user,
         'PASSWORD': db_pw,
         'HOST':'',
         'PORT':'',
