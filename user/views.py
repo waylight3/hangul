@@ -20,4 +20,5 @@ def index(request):
 	data = {
 		'userinfo':userinfo,
 	}
-	return render(request, 'user/index.html', data)
+	return HttpResponseRedirect('/인공지능')
+	# return render(request, 'user/index.html', data)

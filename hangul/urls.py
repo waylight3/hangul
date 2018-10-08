@@ -7,5 +7,6 @@ from user import views as user_views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', user_views.index),
-    url(r'^사전/', include('dic.urls', namespace='dic'))
+    url(r'^사전/', include('dic.urls', namespace='dic')),
+    url(r'^인공지능/', include('ai.urls', namespace='ai'))
 ]
