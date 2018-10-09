@@ -1,4 +1,5 @@
 {% extends "user/base.html" %}
+{% load staticfiles %}
 
 {% block title %}인공지능 실험실{% endblock title %}
 
@@ -9,7 +10,7 @@
 	<div class="col-md-12">
 		<div class="alert alert-info alert-dismissable fade in no-radius">
 			<button type="button" class="close" data-dismiss="alert" aria-hiddent="true">×</button>
-			<div class="alert-body">문장 분석 기능을 제공합니다.</div>
+			<div class="alert-body">Integrated Gradients를 활용하여 Auto Encoder 기반 Style Transfer 모델을 분석합니다.<br>문장을 생성하는 과정에서 주어진 문장의 어느 단어가 얼마나 기여했는가를 구체적인 수치로 제시합니다.<br>문장과 함께 적용하고자 하는 Style(별점)을 입력하면 자세한 분석 결과를 보여줍니다.</div>
 		</div>
 	</div>
 </div>
@@ -18,24 +19,24 @@
 		<form role="form" method="post">{% csrf_token %}
 			<div class="form-group">
 				<label for="sent">문장</label>
-				<input type="text" class="form-control no-radius" name="sent" id="sent" placeholder="문장을 입력해주세요.">
+				<input type="text" class="form-control no-radius" name="sent" id="sent" placeholder="문장을 입력해주세요." {% if show_ig %}value="{{ sent }}"{% endif %}>
 			</div>
 			<label for="star">별점</label>
 			<div class="form-group">
 				<label class="radio-inline">
-					<input type="radio" name="star" value="1">1
+					<input type="radio" name="star" value="1" {% if star == 1 %}checked{% endif %}>1
 				</label>
 				<label class="radio-inline">
-					<input type="radio" name="star" value="2">2
+					<input type="radio" name="star" value="2" {% if star == 2 %}checked{% endif %}>2
 				</label>
 				<label class="radio-inline">
-					<input type="radio" name="star" value="3" checked>					3
+					<input type="radio" name="star" value="3" {% if star == 3 %}checked{% endif %}>3
 				</label>
 				<label class="radio-inline">
-					<input type="radio" name="star" value="4">4
+					<input type="radio" name="star" value="4" {% if star == 4 %}checked{% endif %}>4
 				</label>
 				<label class="radio-inline">
-					<input type="radio" name="star" value="5">5
+					<input type="radio" name="star" value="5" {% if star == 5 %}checked{% endif %}>5
 				</label>
 			</div>
 			{% if err %}
@@ -47,11 +48,44 @@
 </div>
 {% if show_ig %}
 <br><br><br>
+<div class="row">
+	<div class="col-md-12">
+		<h3>Auto Encoder</h3><br><br>
+		Auto Encoder는 문장과 별점을 넣으면 이를 다시 원래 문장으로 출력합니다. 따라서, 학습이 완료되면 문장과 별점에 대한 정보가 합쳐집니다. 이를 이용하여 주어진 문장의 Style을 별점에 따라 바꾸도록 생성 모델을 만들 수 있습니다. 이 떄, 별점이 높을수록 긍정적인 문장을, 별점이 낮을수록 부정적인 문장을 의미합니다.
+	</div>
+</div><br>
+<div class="row">
+	<div class="col-md-offset-1 col-md-10" style="text-align: center; font-size: 2rem;">
+		{% for word in sent %}
+		{{ word }}
+		{% endfor %}
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-offset-1 col-md-10" style="text-align: center; font-size: 2rem;">
+		<img src="{% static 'img/down_arrow.png' %}" style="width:8%;">
+		&nbsp;&nbsp;{% for i in star_range %}★{% endfor %}&nbsp;&nbsp;
+		<img src="{% static 'img/down_arrow.png' %}" style="width:8%;">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-offset-1 col-md-10" style="text-align: center; font-size: 2rem;">
+		{% for word in sent_gen %}
+		{{ word }}
+		{% endfor %}
+	</div>
+</div><br><br>
+<div class="row">
+	<div class="col-md-12">
+		<h3>입력의 기여도</h3><br><br>
+		기여도란 각각의 입력(단어)이 결과에 얼마나 영향을 미치는지에 대한 점수입니다. 값이 클수록 결과를 정하는 데 더 중요한 역할을 하지만, 점수 사이에 비례관계가 있는 것은 아니니 주의해야 합니다.
+	</div>
+</div><br>
 {% for ig_word in ig_word_pair %}
 <div class="row" style="padding-bottom: 5px;">
-	<div class="col-md-1" style="background-color:#0d723b; color:white; border-radius: 10px!important; text-align: center;">{{ ig_word.sent }}</div>
-	<div class="col-md-1" style="text-align: center; padding-right: 0;"><span style="background-color:#0a8a44; color:white; border-radius: 10px!important; display: inline-block; width:100%;">{{ ig_word.ig }}%</span></div>
-	<div class="col-md-10"><div class="barshow"><span style="display:inline-block; width:{{ ig_word.ig }}%; background-color:#2f944d">&nbsp;</span><span style="display:inline-block; width:{{ ig_word.ig_rev }}%; background-color:#bee496">&nbsp;</span></div></div>
+	<div class="col-md-offset-1 col-md-1" style="background-color:#0d723b; color:white; border-radius: 10px!important; text-align: center;">{{ ig_word.sent }}</div>
+	<div class="col-md-1" style="text-align: center; padding-right: 0;"><span style="background-color:#0a8a44; color:white; border-radius: 10px!important; display: inline-block; width:100%;">{{ ig_word.ig }}</span></div>
+	<div class="col-md-8"><div class="barshow"><span style="display:inline-block; width:{{ ig_word.ig }}%; background-color:#2f944d">&nbsp;</span><span style="display:inline-block; width:{{ ig_word.ig_rev }}%; background-color:#bee496">&nbsp;</span></div></div>
 </div>
 {% endfor %}
 {% endif %}

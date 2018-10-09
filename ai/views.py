@@ -142,6 +142,8 @@ def sent_ig(sent, star):
 		feed_dict={X:data_x, X_len:data_x_len, Y:data_y, Y_len:data_x_len, Y_mask:data_mask}
 		ret = sess.run(outputs_dec, feed_dict=feed_dict)
 
+		sent_gen = [idx2word[idx] for idx in ret.sample_id[0]]
+
 		### get IG info
 		t_grads = tf.gradients(outputs_dec, inputs_enc)
 		grads, ie = sess.run([t_grads, inputs_enc], feed_dict={X:interpolate([0 for i in range(max_sent_len)], data_x[0], 100), X_len:[data_x_len[0]] * 100, Y:[data_y[0]] * 100, Y_len:[data_x_len[0]] * 100, Y_mask:[data_mask[0]] * 100})
@@ -153,9 +155,10 @@ def sent_ig(sent, star):
 			t = 0.0
 			for j in range(embedding_dim):
 				t += ie[i][j] * agrads[i][j]
-			ig.append(t)	
+			ig.append(t)
 
-	return ig
+
+	return sent_gen, ig
 
 def softmax(vec):
 	vec = [v - max(vec) for v in vec]
@@ -174,13 +177,16 @@ def view_index(request):
 		userinfo = UserInfo.objects.get(user=request.user)
 	show_ig = False
 	sent = ''
-	star = 1
+	star = 3
 	ig_list = []
 	ig_word_pair = []
 	err = False
 	err_msg = ''
+	sent_gen = []
+	sent_origin = ''
 	if request.method == 'POST':
-		sent = word_tokenize(request.POST['sent'].strip().lower())
+		sent_origin = request.POST['sent'].strip()
+		sent = word_tokenize(sent_origin.lower())
 		star = int(request.POST['star'])
 		if len(sent) > 12:
 			err = True
@@ -189,14 +195,20 @@ def view_index(request):
 			err = True
 			err_msg = '최소 4단어 이상 입력해야 결과를 확인하실 수 있습니다.'
 		else:
-			ig_list = sent_ig(' '.join(sent), star)[1:][:len(sent)]
-			ig_list = list(map(lambda x: int(x + 0.001), rescale(ig_list, full=100)))
+			sent_temp, ig_list = sent_ig(' '.join(sent), star)
+			sent_gen = []
+			for word in sent_temp:
+				sent_gen.append(word)
+				if word in ['.', '?', '!']: break
+			ig_list = list(map(lambda x: int(x + 0.001), rescale(ig_list[1:][:len(sent)], full=100)))
 			ig_word_pair = [{'ig':ig_list[i], 'ig_rev':max(100 - ig_list[i], 0), 'sent':sent[i]} for i in range(len(sent))]
 			show_ig = True
 	data = {
 		'userinfo':userinfo,
 		'sent':sent,
 		'star':star,
+		'star_range':range(star),
+		'sent_gen':sent_gen,
 		'ig_list':ig_list,
 		'ig_word_pair':ig_word_pair,
 		'show_ig':show_ig,
