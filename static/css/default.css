@@ -1114,3 +1114,17 @@ body article blockquote:hover {
 	margin-right: -0.3em;
 	font-weight: bold;
 }
+
+@keyframes show {
+	0% {
+		width: 0%;
+	}
+	100% {
+		width: 100%;
+	}
+}
+
+.barshow {
+	animation-name: show;
+	animation-duration: 2s;
+}

@@ -15,6 +15,7 @@ import tensorflow as tf
 from tensorflow.contrib import layers
 from tensorflow.python.layers import core as layers_core
 import numpy as np
+from nltk.tokenize import sent_tokenize, word_tokenize
 
 def interpolate(v1, v2, step):
 	ret = []
@@ -156,19 +157,49 @@ def sent_ig(sent, star):
 
 	return ig
 
+def softmax(vec):
+	vec = [v - max(vec) for v in vec]
+	ex = [2.71828 ** v for v in vec]
+	exs = sum(ex)
+	return [e / exs for e in ex]
+
+def rescale(vec, full=1):
+	min_val = min(vec)
+	max_val = max(vec)
+	return [full * (v - min_val) / (max_val - min_val) for v in vec]
 
 def view_index(request):
 	userinfo = None
 	if request.user.is_authenticated():
 		userinfo = UserInfo.objects.get(user=request.user)
-	sent = 'this is the main sentence .'
-	star = 5
-	test = sent_ig(sent, star)
-	# dic = get_object_or_404(Dictionary, link=link_dic)
+	show_ig = False
+	sent = ''
+	star = 1
+	ig_list = []
+	ig_word_pair = []
+	err = False
+	err_msg = ''
+	if request.method == 'POST':
+		sent = word_tokenize(request.POST['sent'].strip().lower())
+		star = int(request.POST['star'])
+		if len(sent) > 12:
+			err = True
+			err_msg = '최대 20단어까지만 결과를 확인하실 수 있습니다.'
+		else:
+			ig_list = sent_ig(' '.join(sent), star)[1:]
+			ig_list = list(map(lambda x: int(x + 0.001), rescale(ig_list, full=100)))
+			if len(sent) < 20:
+				sent += ['END'] * (20 - len(sent))
+			ig_word_pair = [{'ig':ig_list[i], 'ig_rev':max(100 - ig_list[i], 0), 'sent':sent[i]} for i in range(20)]
+			show_ig = True
 	data = {
 		'userinfo':userinfo,
-		'test':test,
 		'sent':sent,
-		'star':star
+		'star':star,
+		'ig_list':ig_list,
+		'ig_word_pair':ig_word_pair,
+		'show_ig':show_ig,
+		'err':err,
+		'err_msg':err_msg
 	}
 	return render(request, 'ai/index.html', data)

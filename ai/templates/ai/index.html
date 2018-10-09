@@ -5,6 +5,54 @@
 {% block article_title %}문장 분석{% endblock article_title %}
 
 {% block article_content %}
-<p>{{ star }} + {{ sent }}</p>
-<p>{{ test }}</p>
+<div class="row">
+	<div class="col-md-12">
+		<div class="alert alert-info alert-dismissable fade in no-radius">
+			<button type="button" class="close" data-dismiss="alert" aria-hiddent="true">×</button>
+			<div class="alert-body">문장 분석 기능을 제공합니다.</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-offset-1 col-md-10">
+		<form role="form" method="post">{% csrf_token %}
+			<div class="form-group">
+				<label for="sent">문장</label>
+				<input type="text" class="form-control no-radius" name="sent" id="sent" placeholder="문장을 입력해주세요.">
+			</div>
+			<label for="star">별점</label>
+			<div class="form-group">
+				<label class="radio-inline">
+					<input type="radio" name="star" value="1">1
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="star" value="2">2
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="star" value="3" checked>					3
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="star" value="4">4
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="star" value="5">5
+				</label>
+			</div>
+			{% if err %}
+			<p><span class="label label-warning">{{ err_msg }}</span></p>
+			{% endif %}
+			<button type="submit" class="btn btn-primary btn-block no-radius">분석하기</button>
+		</form>
+	</div>
+</div>
+{% if show_ig %}
+<br><br><br>
+{% for ig_word in ig_word_pair %}
+<div class="row" style="padding-bottom: 5px;">
+	<div class="col-md-1" style="background-color:#0d723b; color:white; border-radius: 10px!important; text-align: center;">{{ ig_word.sent }}</div>
+	<div class="col-md-1" style="text-align: center; padding-right: 0;"><span style="background-color:#0a8a44; color:white; border-radius: 10px!important; display: inline-block; width:100%;">{{ ig_word.ig }}%</span></div>
+	<div class="col-md-10"><div class="barshow"><span style="display:inline-block; width:{{ ig_word.ig }}%; background-color:#2f944d">&nbsp;</span><span style="display:inline-block; width:{{ ig_word.ig_rev }}%; background-color:#bee496">&nbsp;</span></div></div>
+</div>
+{% endfor %}
+{% endif %}
 {% endblock article_content %}
