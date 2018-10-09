@@ -19,7 +19,7 @@
 		<form role="form" method="post">{% csrf_token %}
 			<div class="form-group">
 				<label for="sent">문장</label>
-				<input type="text" class="form-control no-radius" name="sent" id="sent" placeholder="문장을 입력해주세요." {% if show_ig %}value="{{ sent }}"{% endif %}>
+				<input type="text" class="form-control no-radius" name="sent" id="sent" placeholder="문장을 입력해주세요." {% if show_ig %}value="{{ sent_origin }}"{% endif %}>
 			</div>
 			<label for="star">별점</label>
 			<div class="form-group">

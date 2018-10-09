@@ -209,6 +209,7 @@ def view_index(request):
 		'star':star,
 		'star_range':range(star),
 		'sent_gen':sent_gen,
+		'sent_origin':sent_origin,
 		'ig_list':ig_list,
 		'ig_word_pair':ig_word_pair,
 		'show_ig':show_ig,
