@@ -3,25 +3,25 @@
 
 {% block title %}인공지능 실험실{% endblock title %}
 
-{% block article_title %}문장 분석{% endblock article_title %}
+{% block article_title %}Style Transfer Analysis{% endblock article_title %}
 
 {% block article_content %}
 <div class="row">
 	<div class="col-md-12">
 		<div class="alert alert-info alert-dismissable fade in no-radius">
 			<button type="button" class="close" data-dismiss="alert" aria-hiddent="true">×</button>
-			<div class="alert-body">Integrated Gradients를 활용하여 Auto Encoder 기반 Style Transfer 모델을 분석합니다.<br>문장을 생성하는 과정에서 주어진 문장의 어느 단어가 얼마나 기여했는가를 구체적인 수치로 제시합니다.<br>문장과 함께 적용하고자 하는 Style(별점)을 입력하면 자세한 분석 결과를 보여줍니다.</div>
+			<div class="alert-body">Analyze Auto Encoder based Style Transfer models using Integrated Gradients.<!--Integrated Gradients를 활용하여 Auto Encoder 기반 Style Transfer 모델을 분석합니다.--><br>In the process of creating a sentence, we give a specific number of how much of the given sentence contributed.<!--문장을 생성하는 과정에서 주어진 문장의 어느 단어가 얼마나 기여했는가를 구체적인 수치로 제시합니다.--><br>Enter the Style(star rating) you want to apply with the sentence to show the detailed analysis result.<!--문장과 함께 적용하고자 하는 Style(별점)을 입력하면 자세한 분석 결과를 보여줍니다.--></div>
 		</div>
 	</div>
 </div>
 <div class="row">
-	<div class="col-md-offset-1 col-md-10">
+	<div class="col-md-offset-1 col-md-10" style="border: 2px solid #337ab7;">
 		<form role="form" method="post">{% csrf_token %}
 			<div class="form-group">
-				<label for="sent">문장</label>
-				<input type="text" class="form-control no-radius" name="sent" id="sent" placeholder="문장을 입력해주세요." {% if show_ig %}value="{{ sent_origin }}"{% endif %}>
+				<label for="sent">Sentence</label>
+				<input type="text" class="form-control no-radius" name="sent" id="sent" placeholder="Please enter the sentence." {% if show_ig %}value="{{ sent_origin }}"{% endif %}>
 			</div>
-			<label for="star">별점</label>
+			<label for="star">Style(star rating)</label>
 			<div class="form-group">
 				<label class="radio-inline">
 					<input type="radio" name="star" value="1" {% if star == 1 %}checked{% endif %}>1
@@ -42,7 +42,7 @@
 			{% if err %}
 			<p><span class="label label-warning">{{ err_msg }}</span></p>
 			{% endif %}
-			<button type="submit" class="btn btn-primary btn-block no-radius">분석하기</button>
+			<button type="submit" class="btn btn-primary btn-block no-radius" style="margin-bottom: 1rem;">Analyze</button>
 		</form>
 	</div>
 </div>
@@ -51,7 +51,7 @@
 <div class="row">
 	<div class="col-md-12">
 		<h3>Auto Encoder</h3><br><br>
-		Auto Encoder는 문장과 별점을 넣으면 이를 다시 원래 문장으로 출력합니다. 따라서, 학습이 완료되면 문장과 별점에 대한 정보가 합쳐집니다. 이를 이용하여 주어진 문장의 Style을 별점에 따라 바꾸도록 생성 모델을 만들 수 있습니다. 이 떄, 별점이 높을수록 긍정적인 문장을, 별점이 낮을수록 부정적인 문장을 의미합니다.
+		The Auto Encoder will output the sentence again to the original sentence and star rating. Therefore, when the learning is completed, the information about the sentence and the star is combined. We can use this to create a generation model that changes the Style of a given sentence according to a star rating. The higher the score, the more positive the sentence. The lower the score, the more negative the sentence.<!--Auto Encoder는 문장과 별점을 넣으면 이를 다시 원래 문장으로 출력합니다. 따라서, 학습이 완료되면 문장과 별점에 대한 정보가 합쳐집니다. 이를 이용하여 주어진 문장의 Style을 별점에 따라 바꾸도록 생성 모델을 만들 수 있습니다. 이 떄, 별점이 높을수록 긍정적인 문장을, 별점이 낮을수록 부정적인 문장을 의미합니다.-->
 	</div>
 </div><br>
 <div class="row">
@@ -62,7 +62,7 @@
 	</div>
 </div>
 <div class="row">
-	<div class="col-md-offset-1 col-md-10" style="text-align: center; font-size: 2rem;">
+	<div class="col-md-offset-1 col-md-10" style="text-align: center; font-size: 2rem; color: gold;">
 		<img src="{% static 'img/down_arrow.png' %}" style="width:8%;">
 		&nbsp;&nbsp;{% for i in star_range %}★{% endfor %}&nbsp;&nbsp;
 		<img src="{% static 'img/down_arrow.png' %}" style="width:8%;">
@@ -77,8 +77,8 @@
 </div><br><br>
 <div class="row">
 	<div class="col-md-12">
-		<h3>입력의 기여도</h3><br><br>
-		기여도란 각각의 입력(단어)이 결과에 얼마나 영향을 미치는지에 대한 점수입니다. 값이 클수록 결과를 정하는 데 더 중요한 역할을 하지만, 점수 사이에 비례관계가 있는 것은 아니니 주의해야 합니다.
+		<h3>Contribution</h3><br><br>
+		Contribution is the score of how each input (word) affects the outcome. The larger the value, the more important it is to determine the outcome, but be careful not to have a proportional relationship between scores.<!--기여도란 각각의 입력(단어)이 결과에 얼마나 영향을 미치는지에 대한 점수입니다. 값이 클수록 결과를 정하는 데 더 중요한 역할을 하지만, 점수 사이에 비례관계가 있는 것은 아니니 주의해야 합니다.-->
 	</div>
 </div><br>
 {% for ig_word in ig_word_pair %}
@@ -89,4 +89,23 @@
 </div>
 {% endfor %}
 {% endif %}
+<br>
+<div class="row">
+	<div class="col-md-12">
+		<h3>References</h3><br><br>
+		<ul>
+			<li><a href="https://arxiv.org/abs/1703.01365">Axiomatic Attribution for Deep Networks (2018)</a></li>
+			<li><a href="https://arxiv.org/abs/1804.06437">Delete, Retrieve, Generate: A Simple Approach to Sentiment and Style Transfer (2018)</a></li>
+			<li><a href="https://arxiv.org/abs/1805.04833">Hierarchical Neural Story Generation (2018)</a></li>
+			<li><a href="https://arxiv.org/abs/1805.05181">Unpaired Sentiment-to-Sentiment Translation: A Cycled Reinforcement Learning Approach (2018)</a></li>
+			<li><a href="https://arxiv.org/abs/1804.09000">Style Transfer Through Back-Translation (2018)</a></li>
+			<li><a href="https://arxiv.org/abs/1709.08878">Generating Sentences by Editing Prototypes (2017)</a></li>
+			<li><a href="https://arxiv.org/abs/1703.00955">Toward Controlled Generation of Text (2017)</a></li>
+			<li><a href="https://arxiv.org/abs/1705.09655">Style Transfer from Non-Parallel Text by Cross-Alignment (2017)</a></li>
+			<li><a href="https://arxiv.org/abs/1711.06861">Style Transfer in Text: Exploration and Evaluation (2017)</a></li>
+			<li><a href="http://nevitus.com/reports/inf-report.pdf">Challenges with Variational Autoencoders for Text (2016)</a></li>
+			<li><a href="https://arxiv.org/abs/1511.06349">Generating Sentences from a Continuous Space (2015)</a></li>
+		</ul>
+	</div>
+</div>
 {% endblock article_content %}

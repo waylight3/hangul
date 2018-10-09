@@ -190,10 +190,10 @@ def view_index(request):
 		star = int(request.POST['star'])
 		if len(sent) > 12:
 			err = True
-			err_msg = '최대 20단어까지만 결과를 확인하실 수 있습니다.'
+			err_msg = 'You can see results up to 20 words in length.' # 최대 20단어까지만 결과를 확인하실 수 있습니다.
 		elif len(sent) < 4:
 			err = True
-			err_msg = '최소 4단어 이상 입력해야 결과를 확인하실 수 있습니다.'
+			err_msg = 'You must enter a minimum of four words to see the results.' # 최소 4단어 이상 입력해야 결과를 확인하실 수 있습니다.
 		else:
 			sent_temp, ig_list = sent_ig(' '.join(sent), star)
 			sent_gen = []
