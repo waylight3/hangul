@@ -185,6 +185,9 @@ def view_index(request):
 		if len(sent) > 12:
 			err = True
 			err_msg = '최대 20단어까지만 결과를 확인하실 수 있습니다.'
+		elif len(sent) < 4:
+			err = True
+			err_msg = '최소 4단어 이상 입력해야 결과를 확인하실 수 있습니다.'
 		else:
 			ig_list = sent_ig(' '.join(sent), star)[1:][:len(sent)]
 			ig_list = list(map(lambda x: int(x + 0.001), rescale(ig_list, full=100)))
