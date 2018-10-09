@@ -186,11 +186,9 @@ def view_index(request):
 			err = True
 			err_msg = '최대 20단어까지만 결과를 확인하실 수 있습니다.'
 		else:
-			ig_list = sent_ig(' '.join(sent), star)[1:]
+			ig_list = sent_ig(' '.join(sent), star)[1:][:len(sent)]
 			ig_list = list(map(lambda x: int(x + 0.001), rescale(ig_list, full=100)))
-			if len(sent) < 20:
-				sent += ['END'] * (20 - len(sent))
-			ig_word_pair = [{'ig':ig_list[i], 'ig_rev':max(100 - ig_list[i], 0), 'sent':sent[i]} for i in range(20)]
+			ig_word_pair = [{'ig':ig_list[i], 'ig_rev':max(100 - ig_list[i], 0), 'sent':sent[i]} for i in range(len(sent))]
 			show_ig = True
 	data = {
 		'userinfo':userinfo,
