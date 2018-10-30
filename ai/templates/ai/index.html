@@ -3,7 +3,7 @@
 
 {% block title %}인공지능 실험실{% endblock title %}
 
-{% block article_title %}Style Transfer Analysis{% endblock article_title %}
+{% block article_title %}Auto Encoder Visualization{% endblock article_title %}
 
 {% block article_content %}
 <div class="row">
@@ -48,11 +48,11 @@
 </div>
 {% if show_ig %}
 <br><br><br>
-<div class="row">
+<!-- <div class="row">
 	<div class="col-md-12">
 		<h3>Auto Encoder</h3><br><br>
-		The Auto Encoder will output the sentence again to the original sentence and star rating. Therefore, when the learning is completed, the information about the sentence and the star is combined. We can use this to create a generation model that changes the Style of a given sentence according to a star rating. The higher the score, the more positive the sentence. The lower the score, the more negative the sentence.<!--Auto Encoder는 문장과 별점을 넣으면 이를 다시 원래 문장으로 출력합니다. 따라서, 학습이 완료되면 문장과 별점에 대한 정보가 합쳐집니다. 이를 이용하여 주어진 문장의 Style을 별점에 따라 바꾸도록 생성 모델을 만들 수 있습니다. 이 떄, 별점이 높을수록 긍정적인 문장을, 별점이 낮을수록 부정적인 문장을 의미합니다.-->
-	</div>
+		The Auto Encoder will output the sentence again to the original sentence and star rating. Therefore, when the learning is completed, the information about the sentence and the star is combined. We can use this to create a generation model that changes the Style of a given sentence according to a star rating. The higher the score, the more positive the sentence. The lower the score, the more negative the sentence. --><!--Auto Encoder는 문장과 별점을 넣으면 이를 다시 원래 문장으로 출력합니다. 따라서, 학습이 완료되면 문장과 별점에 대한 정보가 합쳐집니다. 이를 이용하여 주어진 문장의 Style을 별점에 따라 바꾸도록 생성 모델을 만들 수 있습니다. 이 떄, 별점이 높을수록 긍정적인 문장을, 별점이 낮을수록 부정적인 문장을 의미합니다.-->
+<!-- 	</div>
 </div><br>
 <div class="row">
 	<div class="col-md-offset-1 col-md-10" style="text-align: center; font-size: 2rem;">
@@ -74,10 +74,10 @@
 		{{ word }}
 		{% endfor %}
 	</div>
-</div><br><br>
+</div><br><br> -->
 <div class="row">
 	<div class="col-md-12">
-		<h3>Contribution</h3><br><br>
+		<h3>Word Contribution to Output</h3><br><br>
 		Contribution is the score of how each input (word) affects the outcome. The larger the value, the more important it is to determine the outcome, but be careful not to have a proportional relationship between scores.<!--기여도란 각각의 입력(단어)이 결과에 얼마나 영향을 미치는지에 대한 점수입니다. 값이 클수록 결과를 정하는 데 더 중요한 역할을 하지만, 점수 사이에 비례관계가 있는 것은 아니니 주의해야 합니다.-->
 	</div>
 </div><br>
@@ -86,6 +86,27 @@
 	<div class="col-md-offset-1 col-md-1" style="background-color:#0d723b; color:white; border-radius: 10px!important; text-align: center;">{{ ig_word.sent }}</div>
 	<div class="col-md-1" style="text-align: center; padding-right: 0;"><span style="background-color:#0a8a44; color:white; border-radius: 10px!important; display: inline-block; width:100%;">{{ ig_word.ig }}</span></div>
 	<div class="col-md-8"><div class="barshow"><span style="display:inline-block; width:{{ ig_word.ig }}%; background-color:#2f944d">&nbsp;</span><span style="display:inline-block; width:{{ ig_word.ig_rev }}%; background-color:#bee496">&nbsp;</span></div></div>
+</div>
+{% endfor %}
+<br>
+<div class="row">
+	<div class="col-md-12">
+		<h3>Word Contribution to Layer</h3><br><br>
+		The graph below shows how each contribution changes as it passes through each layers in detail.
+	</div>
+</div><br>
+<div class="row" style="padding-bottom: 5px;">
+	<div class="col-md-offset-1 col-md-1">&nbsp;</div>
+	<div class="col-md-3"><div class="boxshow"><span style="display:inline-block; color:white; border-radius:10px!important; background-color:#0a8a44; width:100%; text-align:center;">layer1</span></div></div>
+	<div class="col-md-3"><div class="boxshow"><span style="display:inline-block; color:white; border-radius:10px!important; background-color:#0a8a44; width:100%; text-align:center;">layer2</span></div></div>
+	<div class="col-md-3"><div class="boxshow"><span style="display:inline-block; color:white; border-radius:10px!important; background-color:#0a8a44; width:100%; text-align:center;">out</span></div></div>
+</div>
+{% for ig_word in ig_word_pair_detail %}
+<div class="row" style="padding-bottom: 5px;">
+	<div class="col-md-offset-1 col-md-1" style="background-color:#0d723b; color:white; border-radius:10px!important; text-align:center;">{{ ig_word.sent }}</div>
+	<div class="col-md-3"><div class="barshow"><span style="display:inline-block; width:{{ ig_word.ig1 }}%; background-color:#2f944d">&nbsp;</span><span style="display:inline-block; width:{{ ig_word.ig1_rev }}%; background-color:#bee496">&nbsp;</span></div></div>
+	<div class="col-md-3"><div class="barshow"><span style="display:inline-block; width:{{ ig_word.ig3 }}%; background-color:#2f944d">&nbsp;</span><span style="display:inline-block; width:{{ ig_word.ig3_rev }}%; background-color:#bee496">&nbsp;</span></div></div>
+	<div class="col-md-3"><div class="barshow"><span style="display:inline-block; width:{{ ig_word.out }}%; background-color:#2f944d">&nbsp;</span><span style="display:inline-block; width:{{ ig_word.out_rev }}%; background-color:#bee496">&nbsp;</span></div></div>
 </div>
 {% endfor %}
 {% endif %}

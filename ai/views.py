@@ -52,12 +52,12 @@ def sent_ig(sent, star):
 			vocab_dim += 1
 	embedding_dim = 100
 
-	data_x = []
-	data_x_len = []	
-	data_y = []
-	data_mask = []
-	data_star = []
-	data_size = 0
+	test_x = []
+	test_x_len = []	
+	test_y = []
+	test_mask = []
+	test_star = []
+	test_size = 0
 
 	### read data
 	sent_idx = []
@@ -73,12 +73,12 @@ def sent_ig(sent, star):
 			sent_mask.append(0.0)
 		if len(sent_idx) >= max_sent_len:
 			break
-	data_x.append([GO] + sent_idx + [PAD for _ in range(max_sent_len - len(sent_idx))])
-	data_y.append(sent_idx + [END] + [PAD for _ in range(max_sent_len - len(sent_idx))])
-	data_mask.append(sent_mask + [1.0] + [0.0 for _ in range(max_sent_len - len(sent_idx))])
-	data_x_len.append(max_sent_len + 1)
-	data_star.append([1 if i + 1 == star else 0 for i in range(5)])
-	data_size += 1
+	test_x.append([GO] + sent_idx + [PAD for _ in range(max_sent_len - len(sent_idx))])
+	test_y.append(sent_idx + [END] + [PAD for _ in range(max_sent_len - len(sent_idx))])
+	test_mask.append(sent_mask + [1.0] + [0.0 for _ in range(max_sent_len - len(sent_idx))])
+	test_x_len.append(max_sent_len + 1)
+	test_star.append([1 if i + 1 == star else 0 for i in range(5)])
+	test_size += 1
 
 	max_sent_len += 1 # +1 for _star_ and <END>
 
@@ -114,14 +114,40 @@ def sent_ig(sent, star):
 		sess.run(tf.global_variables_initializer())
 		saver.restore(sess, 'data/model')
 
-		feed_dict={X:data_x, X_len:data_x_len, Y:data_y, Y_len:data_x_len, Y_mask:data_mask, Star:data_star}
-		ret = sess.run(outputs_dec, feed_dict=feed_dict)
+		# feed_dict={X:data_x, X_len:data_x_len, Y:data_y, Y_len:data_x_len, Y_mask:data_mask, Star:data_star}
+		# ret = sess.run(outputs_dec, feed_dict=feed_dict)
 
-		sent_gen = [idx2word[idx] for idx in ret.sample_id[0]]
+		# sent_gen = [idx2word[idx] for idx in ret.sample_id[0]]
 
 		### get IG info
+		# t_grads = tf.gradients(outputs_dec, inputs_enc)
+		# grads, ie = sess.run([t_grads, inputs_enc], feed_dict={X:interpolate([0 for i in range(max_sent_len)], data_x[0], 100), X_len:[data_x_len[0]] * 100, Y:[data_y[0]] * 100, Y_len:[data_x_len[0]] * 100, Y_mask:[data_mask[0]] * 100, Star:[data_star[0]] * 100})
+		# grads = np.array(grads)
+		# ie = np.array(ie[0]) # select [0] since we calc 100 data for interpolation
+		# agrads = np.average(grads, axis=1)[0]
+		# ig = []
+		# for i in range(max_sent_len):
+		# 	t = 0.0
+		# 	for j in range(embedding_dim):
+		# 		t += ie[i][j] * agrads[i][j]
+		# 	ig.append(t)
+
+		ig_list = []
+		sent_gen_list = []
+		node_ig1_list = []
+		node_ig2_list = []
+		node_ig3_list = []
+
+		### get tensor values
 		t_grads = tf.gradients(outputs_dec, inputs_enc)
-		grads, ie = sess.run([t_grads, inputs_enc], feed_dict={X:interpolate([0 for i in range(max_sent_len)], data_x[0], 100), X_len:[data_x_len[0]] * 100, Y:[data_y[0]] * 100, Y_len:[data_x_len[0]] * 100, Y_mask:[data_mask[0]] * 100, Star:[data_star[0]] * 100})
+		t_grads1 = tf.gradients(g1, inputs_enc)
+		# t_grads2 = tf.gradients(outputs_dec, g2)
+		t_grads3 = tf.gradients(latent, inputs_enc)
+		ret, grads, grads1, grads3, ie, _g1, _g3 = sess.run([outputs_dec, t_grads, t_grads1, t_grads3, inputs_enc, g1, latent], feed_dict={X:interpolate([0 for i in range(max_sent_len)], test_x[0], 100), X_len:[test_x_len[0]] * 100, Y:[test_y[0]] * 100, Y_len:[test_x_len[0]] * 100, Y_mask:[test_mask[0]] * 100, Star:[test_star[0]] * 100})
+
+		sent_gen = ' '.join([idx2word[idx] for idx in ret.sample_id[0]])
+
+		### get IG info
 		grads = np.array(grads)
 		ie = np.array(ie[0]) # select [0] since we calc 100 data for interpolation
 		agrads = np.average(grads, axis=1)[0]
@@ -130,10 +156,54 @@ def sent_ig(sent, star):
 			t = 0.0
 			for j in range(embedding_dim):
 				t += ie[i][j] * agrads[i][j]
-			ig.append(abs(t))
+			ig.append(t)
+
+		ig_list.append(ig)
+		sent_gen_list.append(sent_gen)
+
+		#################### get IG of g1/g2/latent ####################
+		### get IG of g1
+		grads1 = np.array(grads1)
+		_g1 = np.array(_g1[0]) # select [0] since we calc 100 data for interpolation
+		agrads = np.average(grads1, axis=1)[0]
+
+		ig = []
+		for i in range(max_sent_len):
+			t = 0.0
+			for j in range(embedding_dim):
+				t += ie[i][j] * agrads[i][j]
+			ig.append(t)
+
+		node_ig1_list.append(ig)
+
+		### get IG of g2
+		# grads2 = np.array(grads2)
+		# _g2 = np.array(_g2[0]) # select [0] since we calc 100 data for interpolation
+		# agrads = np.average(grads2, axis=1)[0]
+
+		# ig = []
+		# for i in range(latent_dim * 2):
+		# 	t = _g2[i] * agrads[i]
+		# 	ig.append(t)
+
+		# node_ig2_list.append(ig)
+
+		### get IG of latent
+		grads3 = np.array(grads3)
+		_g3 = np.array(_g3[0]) # select [0] since we calc 100 data for interpolation
+		agrads = np.average(grads3, axis=1)[0]
+
+		ig = []
+		for i in range(max_sent_len):
+			t = 0.0
+			for j in range(embedding_dim):
+				t += ie[i][j] * agrads[i][j]
+			ig.append(t)
+
+		node_ig3_list.append(ig)
 
 
-	return sent_gen, ig
+	return sent_gen_list[0], ig_list[0], node_ig1_list[0], node_ig3_list[0]
 
 def softmax(vec):
 	vec = [v - max(vec) for v in vec]
@@ -161,6 +231,7 @@ def view_index(request):
 	star = 3
 	ig_list = []
 	ig_word_pair = []
+	ig_word_pair_detail = []
 	err = False
 	err_msg = ''
 	sent_gen = []
@@ -176,13 +247,16 @@ def view_index(request):
 			err = True
 			err_msg = 'You must enter a minimum of four words to see the results.' # 최소 4단어 이상 입력해야 결과를 확인하실 수 있습니다.
 		else:
-			sent_temp, ig_list = sent_ig(' '.join(sent), star)
+			sent_temp, ig_list, ig_list_1, ig_list_3 = sent_ig(' '.join(sent), star)
 			sent_gen = []
 			for word in sent_temp:
 				sent_gen.append(word)
 				if word in ['.', '?', '!']: break
-			ig_list = list(map(lambda x: int(x + 0.001), rescale(ig_list[1:][:len(sent)], full=100, base='min')))
+			ig_list = list(map(lambda x: abs(int(x + 0.001)), rescale(ig_list[1:][:len(sent)], full=100, base='zero')))
+			ig_list_1 = list(map(lambda x: abs(int(x + 0.001)), rescale(ig_list_1, full=100, base='zero')))
+			ig_list_3 = list(map(lambda x: abs(int(x + 0.001)), rescale(ig_list_3, full=100, base='zero')))
 			ig_word_pair = [{'ig':ig_list[i], 'ig_rev':max(100 - ig_list[i], 0), 'sent':sent[i]} for i in range(len(sent))]
+			ig_word_pair_detail = [{'ig1':ig_list_1[i], 'ig1_rev':max(100 - ig_list_1[i], 0), 'ig3':ig_list_3[i], 'ig3_rev':max(100 - ig_list_3[i], 0), 'out':ig_list[i], 'out_rev':max(100 - ig_list[i], 0), 'sent':sent[i]} for i in range(len(sent))]
 			show_ig = True
 	data = {
 		'userinfo':userinfo,
@@ -193,6 +267,7 @@ def view_index(request):
 		'sent_origin':sent_origin,
 		'ig_list':ig_list,
 		'ig_word_pair':ig_word_pair,
+		'ig_word_pair_detail':ig_word_pair_detail,
 		'show_ig':show_ig,
 		'err':err,
 		'err_msg':err_msg
