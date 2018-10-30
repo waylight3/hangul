@@ -254,7 +254,7 @@ def view_index(request):
 				if word in ['.', '?', '!']: break
 			ig_list = list(map(lambda x: min(abs(int(x + 0.001)), 100), rescale(ig_list[1:][:len(sent)], full=100, base='zero')))
 			ig_list_1 = list(map(lambda x: min(abs(int(x + 0.001)), 100), rescale(ig_list_1, full=100, base='zero')))
-			ig_list_3 = list(map(lambda x: min(abs(int(x + 0.001)) 100), rescale(ig_list_3, full=100, base='zero')))
+			ig_list_3 = list(map(lambda x: min(abs(int(x + 0.001)), 100), rescale(ig_list_3, full=100, base='zero')))
 			ig_word_pair = [{'ig':ig_list[i], 'ig_rev':max(100 - ig_list[i], 0), 'sent':sent[i]} for i in range(len(sent))]
 			ig_word_pair_detail = [{'ig1':ig_list_1[i], 'ig1_rev':max(100 - ig_list_1[i], 0), 'ig3':ig_list_3[i], 'ig3_rev':max(100 - ig_list_3[i], 0), 'out':ig_list[i], 'out_rev':max(100 - ig_list[i], 0), 'sent':sent[i]} for i in range(len(sent))]
 			show_ig = True
